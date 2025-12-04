@@ -99,6 +99,7 @@ def _build_req_from_sampling(s: SamplingParams) -> Req:
 async def generations(
     request: ImageGenerationsRequest,
 ):
+    print('apiserver receive', time.perf_counter())
     request_id = generate_request_id()
     sampling = _build_sampling_params_from_request(
         request_id=request_id,

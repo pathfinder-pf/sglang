@@ -161,6 +161,8 @@ class Scheduler:
             # 1: receive requests
             try:
                 reqs = self.recv_reqs()
+                import time
+                print('schedule receive', time.perf_counter())
             except Exception as e:
                 logger.error(
                     f"Error receiving requests in scheduler event loop: {e}",
