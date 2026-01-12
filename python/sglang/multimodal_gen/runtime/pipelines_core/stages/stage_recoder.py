@@ -4,42 +4,50 @@ import json
 import torch
 
 
+def serialize_value(v):
+    """安全地序列化值"""
+    try:
+        if isinstance(v, torch.Tensor):
+            return v.detach().cpu().numpy().tolist()
+        elif isinstance(v, list):
+            if len(v) == 0:
+                return []
+            elif isinstance(v[0], torch.Tensor):
+                return [t.detach().cpu().numpy().tolist() for t in v]
+            else:
+                return [str(item) for item in v]
+        else:
+            return str(v)
+    except Exception as e:
+        return f"<serialize error: {e}>"
+
+
 def log_io(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         # 获取函数名和类名
         func_name = func.__name__
-        # args[0] 是 self，获取类名用 type(args[0]).__name__
         class_name = type(args[0]).__name__ if args else "Unknown"
 
         print(f"--- Calling: {class_name}.{func_name} ---")
-        print(f"Input Args: {args}")
-        print(f"Input Kwargs: {kwargs}")
 
         try:
-            # 保存调用前的状态
             data = {}
+
+            # 保存调用前的状态
             if len(args) > 1 and hasattr(args[1], '__dict__'):
                 data["before"] = {}
                 for k, v in args[1].__dict__.items():
-                    if type(v) is list and len(v) > 0 and type(v[0]) is torch.Tensor:
-                        data["before"][k] = v[0].detach().cpu().numpy().tolist()
-                    elif type(v) is torch.Tensor:
-                        data["before"][k] = v.detach().cpu().numpy().tolist()
-                    else:
-                        data["before"][k] = str(v)
+                    data["before"][k] = serialize_value(v)
+
             # 执行原函数
             result = func(*args, **kwargs)
 
-            # 保存调用后的状态
+            # 保存调用后的状态 (注意这里是 "after" 不是 "before")
             if hasattr(result, '__dict__'):
+                data["after"] = {}  # 修复：创建 "after" 字典
                 for k, v in result.__dict__.items():
-                    if type(v) is list and len(v) > 0 and type(v[0]) is torch.Tensor:
-                        data["after"][k] = v[0].detach().cpu().numpy().tolist()
-                    elif type(v) is torch.Tensor:
-                        data["after"][k] = v.detach().cpu().numpy().tolist()
-                    else:
-                        data["after"][k] = str(v)
+                    data["after"][k] = serialize_value(v)  # 修复：写入 "after"
 
             # 使用类名和函数名作为文件名
             file_name = f"{class_name}_{func_name}"
