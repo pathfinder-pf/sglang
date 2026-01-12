@@ -22,7 +22,7 @@ def log_io(func):
             if len(args) > 1 and hasattr(args[1], '__dict__'):
                 data["before"] = {}
                 for k, v in args[1].__dict__.items():
-                    if type(v) is list and type(v[0]) is torch.Tensor:
+                    if type(v) is list and len(v) > 0 and type(v[0]) is torch.Tensor:
                         data["before"][k] = v[0].detach().cpu().numpy().tolist()
                     elif type(v) is torch.Tensor:
                         data["before"][k] = v.detach().cpu().numpy().tolist()
@@ -34,7 +34,7 @@ def log_io(func):
             # 保存调用后的状态
             if hasattr(result, '__dict__'):
                 for k, v in result.__dict__.items():
-                    if type(v) is list and type(v[0]) is torch.Tensor:
+                    if type(v) is list and len(v) > 0 and type(v[0]) is torch.Tensor:
                         data["after"][k] = v[0].detach().cpu().numpy().tolist()
                     elif type(v) is torch.Tensor:
                         data["after"][k] = v.detach().cpu().numpy().tolist()
