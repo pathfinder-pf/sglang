@@ -35,11 +35,11 @@ def log_io(func):
             if hasattr(result, '__dict__'):
                 for k, v in result.__dict__.items():
                     if type(v) is list and type(v[0]) is torch.Tensor:
-                        data["before"][k] = v[0].detach().cpu().numpy().tolist()
+                        data["after"][k] = v[0].detach().cpu().numpy().tolist()
                     elif type(v) is torch.Tensor:
-                        data["before"][k] = v.detach().cpu().numpy().tolist()
+                        data["after"][k] = v.detach().cpu().numpy().tolist()
                     else:
-                        data["before"][k] = str(v)
+                        data["after"][k] = str(v)
 
             # 使用类名和函数名作为文件名
             file_name = f"{class_name}_{func_name}"
