@@ -25,6 +25,8 @@ from sglang.multimodal_gen.runtime.pipelines_core.stages.validators import (
 from sglang.multimodal_gen.runtime.server_args import ServerArgs
 from sglang.multimodal_gen.runtime.utils.logging_utils import init_logger
 
+from sglang.python.sglang.multimodal_gen.runtime.pipelines_core.stages.stage_recoder import log_io
+
 logger = init_logger(__name__)
 
 
@@ -46,6 +48,7 @@ class TextEncodingStage(PipelineStage):
         self.text_encoders = text_encoders
 
     @torch.no_grad()
+    @log_io
     def forward(
         self,
         batch: Req,

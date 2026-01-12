@@ -67,6 +67,8 @@ from sglang.multimodal_gen.runtime.utils.perf_logger import StageProfiler
 from sglang.multimodal_gen.runtime.utils.profiler import SGLDiffusionProfiler
 from sglang.multimodal_gen.utils import dict_to_3d_list, masks_like
 
+from sglang.python.sglang.multimodal_gen.runtime.pipelines_core.stages.stage_recoder import log_io
+
 logger = init_logger(__name__)
 
 
@@ -916,6 +918,7 @@ class DenoisingStage(PipelineStage):
         return latents
 
     @torch.no_grad()
+    @log_io
     def forward(
         self,
         batch: Req,

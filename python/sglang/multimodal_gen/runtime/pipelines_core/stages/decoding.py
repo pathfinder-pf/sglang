@@ -25,6 +25,8 @@ from sglang.multimodal_gen.runtime.server_args import ServerArgs, get_global_ser
 from sglang.multimodal_gen.runtime.utils.logging_utils import init_logger
 from sglang.multimodal_gen.utils import PRECISION_TO_TYPE
 
+from sglang.python.sglang.multimodal_gen.runtime.pipelines_core.stages.stage_recoder import log_io
+
 logger = init_logger(__name__)
 
 
@@ -181,6 +183,7 @@ class DecodingStage(PipelineStage):
             self.server_args.model_loaded["vae"] = False
 
     @torch.no_grad()
+    @log_io
     def forward(
         self,
         batch: Req,
