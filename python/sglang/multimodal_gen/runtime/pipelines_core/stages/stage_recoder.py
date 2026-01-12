@@ -20,14 +20,26 @@ def log_io(func):
             # 保存调用前的状态
             data = {}
             if len(args) > 1 and hasattr(args[1], '__dict__'):
-                data["before"] = {k: v[0].detach().cpu().numpy().tolist() if type(v) is list and type(v[0]) is torch.Tensor else str(v) for k, v in args[1].__dict__.items()}
-
+                data["before"] = {}
+                for k, v in args[1].__dict__.items():
+                    if type(v) is list and type(v[0]) is torch.Tensor:
+                        data["before"][k] = v[0].detach().cpu().numpy().tolist()
+                    elif type(v) is torch.Tensor:
+                        data["before"][k] = v.detach().cpu().numpy().tolist()
+                    else:
+                        data["before"][k] = str(v)
             # 执行原函数
             result = func(*args, **kwargs)
 
             # 保存调用后的状态
             if hasattr(result, '__dict__'):
-                data["after"] = {k: v[0].detach().cpu().numpy().tolist() if type(v) is list and type(v[0]) is torch.Tensor else str(v) for k, v in result.__dict__.items()}
+                for k, v in result.__dict__.items():
+                    if type(v) is list and type(v[0]) is torch.Tensor:
+                        data["before"][k] = v[0].detach().cpu().numpy().tolist()
+                    elif type(v) is torch.Tensor:
+                        data["before"][k] = v.detach().cpu().numpy().tolist()
+                    else:
+                        data["before"][k] = str(v)
 
             # 使用类名和函数名作为文件名
             file_name = f"{class_name}_{func_name}"
