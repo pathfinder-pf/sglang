@@ -14,7 +14,7 @@ def log_io(func):
             # 执行原函数
             file_name = args[0].__name__
             data = {}
-            data |= {"before": args[1]}
+            data |= {"before": args[1].__dict__}
             result = func(*args, **kwargs)
             data |= {"after": result.__dict__}
             with open(f"{file_name}.json", "w") as f:
